@@ -45,12 +45,81 @@ public class lambda_colecciones implements RequestHandler<APIGatewayV2HTTPEvent,
                     return getAllColecciones(context);
                 case "DELETE":
                     return deleteColeccionbyID(request.getBody(), context);
+                case "PUT":
+                    return modifyColeccionbyID(request.getBody(), context);
                 default:
                     return createResponse(400, "Método HTTP no soportado: " + httpMethod);
             }
         } catch (Exception e) {
             context.getLogger().log("ERROR en handleRequest: " + e.getMessage());
             return createResponse(500, "Error interno: " + e.getMessage());
+        }
+    }
+
+    private APIGatewayProxyResponseEvent modifyColeccionbyID(String body, Context context) {
+        try {
+            context.getLogger().log("Cuerpo recibido en PUT: " + body);
+            if (body == null || body.trim().isEmpty()) {
+                return createResponse(400, "El cuerpo de la solicitud está vacío.");
+            }
+
+            // Convertimos el JSON a un Map
+            Map<String, Object> rawMap = objectMapper.readValue(body, new TypeReference<Map<String, Object>>() {});
+
+            String id_coleccion = (String) rawMap.get("id_coleccion");
+            if (id_coleccion == null || id_coleccion.trim().isEmpty()) {
+                return createResponse(400, "Falta el campo 'id_coleccion'.");
+            }
+
+            // Construimos itemKey solo con la clave primaria
+            Map<String, AttributeValue> itemKey = new HashMap<>();
+            itemKey.put("id_coleccion", AttributeValue.builder().s(id_coleccion).build());
+
+            // Construimos la expresión de actualización
+            StringBuilder updateExpression = new StringBuilder("SET ");
+            Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
+            Map<String, String> expressionAttributeNames = new HashMap<>();
+
+            int count = 0;
+            for (Map.Entry<String, Object> entry : rawMap.entrySet()) {
+                String key = entry.getKey();
+                if (!key.equals("id_coleccion")) {  // Excluimos la clave primaria
+                    count++;
+                    String fieldKey = "#field" + count;
+                    String valueKey = ":val" + count;
+
+                    updateExpression.append(count > 1 ? ", " : "").append(fieldKey).append(" = ").append(valueKey);
+                    expressionAttributeNames.put(fieldKey, key);
+
+                    if (entry.getValue() instanceof String) {
+                        expressionAttributeValues.put(valueKey, AttributeValue.builder().s((String) entry.getValue()).build());
+                    } else if (entry.getValue() instanceof Number) {
+                        expressionAttributeValues.put(valueKey, AttributeValue.builder().n(entry.getValue().toString()).build());
+                    } else if (entry.getValue() instanceof Boolean) {
+                        expressionAttributeValues.put(valueKey, AttributeValue.builder().bool((Boolean) entry.getValue()).build());
+                    }
+                }
+            }
+
+            if (count == 0) {
+                return createResponse(400, "No hay campos válidos para actualizar.");
+            }
+
+            // Construimos la solicitud UpdateItemRequest
+            UpdateItemRequest request = UpdateItemRequest.builder()
+                    .tableName(tableName)
+                    .key(itemKey)
+                    .updateExpression(updateExpression.toString())
+                    .expressionAttributeNames(expressionAttributeNames)
+                    .expressionAttributeValues(expressionAttributeValues)
+                    .build();
+
+            dynamoDbClient.updateItem(request);
+            return createResponse(200, "Coleccion actualizada correctamente.");
+
+        } catch (Exception e) {
+            context.getLogger().log("ERROR en modifyColeccionbyID: " + e.getMessage());
+            return createResponse(500, "Error al actualizar coleccion: " + e.getMessage());
         }
     }
 
