@@ -194,7 +194,15 @@ public class lambda_colecciones implements RequestHandler<APIGatewayV2HTTPEvent,
     }
 
     private APIGatewayProxyResponseEvent createResponse(int statusCode, String body) {
-        return new APIGatewayProxyResponseEvent().withStatusCode(statusCode).withBody(body);
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        headers.put("Access-Control-Allow-Origin", "*"); // Opcional, para CORS
+        headers.put("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+
+        return new APIGatewayProxyResponseEvent()
+                .withStatusCode(statusCode)
+                .withHeaders(headers)
+                .withBody(body);
     }
 
     private APIGatewayProxyResponseEvent deleteColeccionbyID(String body, Context context){
