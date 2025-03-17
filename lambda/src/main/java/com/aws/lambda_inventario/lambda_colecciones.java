@@ -115,7 +115,10 @@ public class lambda_colecciones implements RequestHandler<APIGatewayV2HTTPEvent,
                     .build();
 
             dynamoDbClient.updateItem(request);
-            return createResponse(200, "Coleccion actualizada correctamente.");
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("id_coleccion", id_coleccion);
+            responseMap.put("mensaje", "Coleccion actualizado correctamente.");
+            return createResponse(200, objectMapper.writeValueAsString(responseMap));
 
         } catch (Exception e) {
             context.getLogger().log("ERROR en modifyColeccionbyID: " + e.getMessage());
