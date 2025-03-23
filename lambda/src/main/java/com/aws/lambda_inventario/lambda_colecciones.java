@@ -213,7 +213,7 @@ public class lambda_colecciones implements RequestHandler<APIGatewayV2HTTPEvent,
             }
 
             Map<String, AttributeValue> key = new HashMap<>();
-            key.put("id_coleccion",AttributeValue.fromN(id_coleccion));
+            key.put("id_coleccion", AttributeValue.builder().s(id_coleccion).build());
 
             Object objeto = dynamoDbClient.deleteItem(DeleteItemRequest.builder().tableName(tableName).key(key).returnValues(ReturnValue.ALL_OLD).build());
             context.getLogger().log("Objeto eliminado: " + objeto.toString());
