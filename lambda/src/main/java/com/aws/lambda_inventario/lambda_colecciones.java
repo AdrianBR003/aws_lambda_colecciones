@@ -142,18 +142,6 @@ public class lambda_colecciones implements RequestHandler<APIGatewayV2HTTPEvent,
             Map<String, AttributeValue> item = new HashMap<>();
             item.put("id_coleccion", AttributeValue.builder().s(coleccion.getId_coleccion()).build());
             item.put("nombre", AttributeValue.builder().s(coleccion.getNombre()).build());
-            if (coleccion.getDescripcion() != null) {
-                item.put("descripcion", AttributeValue.builder().s(coleccion.getDescripcion()).build());
-            }
-            if (coleccion.getTipo_coleccion() != null) {
-                item.put("tipo_coleccion", AttributeValue.builder().s(coleccion.getTipo_coleccion()).build());
-            }
-            if (coleccion.getId_padre() != null) {
-                item.put("id_padrecoleccion", AttributeValue.builder().s(coleccion.getId_padre()).build());
-            }
-            if (coleccion.getUbicacion() != null) {
-                item.put("ubicacion", AttributeValue.builder().s(coleccion.getUbicacion()).build());
-            }
             if (coleccion.getResponsable() != null) {
                 item.put("responsable", AttributeValue.builder().s(coleccion.getResponsable()).build());
             }
@@ -239,19 +227,7 @@ public class lambda_colecciones implements RequestHandler<APIGatewayV2HTTPEvent,
     public static class Coleccion {
         private String id_coleccion;
         private String nombre;
-        private String tipo_coleccion;
-        private String id_padre;
-        private String ubicacion;
         private String responsable;
-        private String descripcion;
-
-        public String getDescripcion() {
-            return descripcion;
-        }
-
-        public void setDescripcion(String descripcion) {
-            this.descripcion = descripcion;
-        }
 
         public String getId_coleccion() {
             return id_coleccion;
@@ -267,30 +243,6 @@ public class lambda_colecciones implements RequestHandler<APIGatewayV2HTTPEvent,
 
         public void setNombre(String nombre) {
             this.nombre = nombre;
-        }
-
-        public String getTipo_coleccion() {
-            return tipo_coleccion;
-        }
-
-        public void setTipo_coleccion(String tipo_coleccion) {
-            this.tipo_coleccion = tipo_coleccion;
-        }
-
-        public String getId_padre() {
-            return id_padre;
-        }
-
-        public void setId_padre(String id_padre) {
-            this.id_padre = id_padre;
-        }
-
-        public String getUbicacion() {
-            return ubicacion;
-        }
-
-        public void setUbicacion(String ubicacion) {
-            this.ubicacion = ubicacion;
         }
 
         public String getResponsable() {
